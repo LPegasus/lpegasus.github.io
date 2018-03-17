@@ -1,0 +1,62 @@
+{
+  "name": "lpegasus.github.io",
+  "version": "1.0.0",
+  "description": "blog",
+  "scripts": {
+    "build": "webpack -p",
+    "start": "cross-env NODE_ENV=dev BABEL_DISABLE_CACHE=1 webpack-dev-server --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LPegasus/lpegasus.github.io.git"
+  },
+  "keywords": [
+    "react",
+    "image",
+    "clip"
+  ],
+  "peerDependencies": {
+    "react": "*",
+    "react-dom": "*"
+  },
+  "author": {
+    "email": "pegusas1@hotmail.com",
+    "name": "LPegasus"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "@types/react": "^16.0.40",
+    "@types/react-dom": "^16.0.4",
+    "awesome-typescript-loader": "^4.0.1",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "cross-env": "^5.1.4",
+    "css-loader": "^0.28.10",
+    "event-stream": "^3.3.4",
+    "extract-text-webpack-plugin": "^3",
+    "fs-extra": "^5.0.0",
+    "glob": "^7.1.2",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^8.0.0-beta.2",
+    "gulp-typescript": "^4.0.1",
+    "less": "^3.0.1",
+    "less-loader": "^4.1.0",
+    "merge2": "^1.2.1",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "source-map-loader": "^0.2.3",
+    "style-loader": "^0.20.3",
+    "typescript": "^2.7.2",
+    "underscore": "^1.8.3",
+    "webpack": "^3.0.0",
+    "webpack-dev-server": "^2.0.0"
+  },
+  "dependencies": {
+    "material-ui": "^0.20.0",
+    "react-imgclip": "^1.0.0-beta.1",
+    "react-router-dom": "^4.2.2",
+    "redux-thunk-promise": "^1.0.1",
+    "tslib": "^1.9.0"
+  }
+}
