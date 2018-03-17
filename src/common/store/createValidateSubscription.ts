@@ -1,5 +1,5 @@
 import asyncValidator from 'async-validator';
-import debounce from 'lodash.debounce';
+import { debounce } from 'lodash-es';
 import { Defer } from './utils';
 import { internalActionType } from './constants';
 
@@ -90,7 +90,7 @@ export default function createValidateSubscription(validators, local) {
         }
       });
     }
-  }, 300, { leading: true, trailing: true });
+  }, 300, { leading: true });
 
   const run = (fieldName?) => {
     localWithState.defer = new Defer();

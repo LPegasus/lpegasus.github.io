@@ -22,9 +22,9 @@ const entries = fs.readdirSync(path.resolve(process.cwd(), 'src', 'entry'))
     return res;
   }, {});
 
-pages.forEach(function(cfg) {
+pages.forEach(function (cfg) {
   const code = tplImpl(cfg);
-  fs.writeFile(cfg.pathname, code, function(err) {
+  fs.writeFile(cfg.pathname, code, function (err) {
     if (err) {
       console.error(err);
       return;
@@ -60,12 +60,20 @@ module.exports = {
 
   module: {
     rules: [
-      // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
       {
-        test: /\.tsx?$/,
+        test: /\.jsx?$/,
         use: [
           {
-            loader: 'babel-loader'
+            loader: 'babel-loader',
+          },
+        ],
+        exclude: /node_modules/
+      }, {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'babel-loader',
           },
           {
             loader: 'awesome-typescript-loader',

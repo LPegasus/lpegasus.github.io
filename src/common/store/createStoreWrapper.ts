@@ -1,11 +1,18 @@
-import { createStore as reduxCreateStore, applyMiddleware, AnyAction, compose } from 'redux';
+import { createStore as reduxCreateStore, applyMiddleware, AnyAction, compose } from 'redux/es';
 import thunk from 'redux-mid-async-func';
 import omit from 'omit.js';
 import { internalActionType } from './constants';
 import {
   bindActions, bindThunks,
-  createWatchReducer, validatorRunnerMiddleware,
+  createWatchReducer,
 } from './utils';
+import validatingReducer from './reducers/validatingReducer';
+import forceUpdateReducer from './reducers/forceUpdateReducer';
+import stateChangeReducer from './reducers/stateChangeReducer';
+import createValidateSubscription from './createValidateSubscription';
+import mergeStateReducer from './reducers/mergeStateReducer';
+import validatorRunnerMiddleware from './middlewares/validatorRunnerMiddlware';
+import asyncThunksCallMiddleware from './middlewares/asyncThunksCallMiddleware';
 
 function mergeReducer(...reducers) {
   if (reducers.length === 0) {
@@ -17,62 +24,6 @@ function mergeReducer(...reducers) {
         return reducer(preState, action);
       }, state);
   };
-}
-
-function validatingReducer(state, action) {
-  if (action.type === internalActionType.validateStart) {
-    return { ...state, validating: true };
-  } else if (action.type === internalActionType.validateEnd) {
-    return { ...state, validating: false };
-  }
-  return state;
-}
-
-function forceUpdateReducer(state, action) {
-  if (action.type === internalActionType.forceUpdate) {
-    return { ...state };
-  }
-  return state;
-}
-
-/**
- * 字段数据变更
- *
- * @param {any} state
- * @param {any} action
- * @returns
- */
-function fieldChangeReducer(state, action) {
-  if (action.type === internalActionType.fieldChange && action.field) {
-    state[action.field] = action.payload;
-    return { ...state };
-  }
-  return state;
-}
-
-/**
- * 重置 state
- *
- * @param {any} state
- * @param {{ type: string, payload: any }} action
- * @returns
- */
-function setInitialStateReducer(state, action: { type: string, payload: any, full: boolean }) {
-  if (action.type === internalActionType.initState) {
-    // 第一期暂不支持 复杂数据结构，必须平铺
-    // const flattenedData = flattenData(action.payload);
-    const flattenedData = action.payload;
-    const rtn: any = {};
-    Object.keys(flattenedData).forEach(f => {
-      rtn[f] = flattenedData[f];
-    });
-    if (action.full) { // 全量覆盖
-      return rtn;
-    } else {  // 合并覆盖
-      return { ...state, ...rtn };
-    }
-  }
-  return state;
 }
 
 export default function createStoreWrapper(config) {
@@ -150,10 +101,9 @@ export default function createStoreWrapper(config) {
   } as any;
   const store = reduxCreateStore(
     mergeReducer(
-      // validateEndReducer,
       forceUpdateReducer,
-      fieldChangeReducer,
-      setInitialStateReducer,
+      stateChangeReducer,
+      mergeStateReducer,
       validatingReducer,
       customReducer,
       watchReducer,
@@ -161,6 +111,7 @@ export default function createStoreWrapper(config) {
     initialState,
     composeEnhancers(
       applyMiddleware(
+        asyncThunksCallMiddleware(config.thunks),
         thunk.withExtraArgument(extraArgument),
         validatorRunnerMiddleware(validateRunner),
       ),
@@ -187,7 +138,7 @@ export default function createStoreWrapper(config) {
 
   local.form.setInitialState = (value, isFull?: boolean) => {
     store.dispatch({
-      type: internalActionType.initState,
+      type: internalActionType.merge,
       payload: value,
       full: isFull,
     });

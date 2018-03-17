@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { connect, Provider } from 'react-redux';
+
 const noop = () => null;
 
-export default (local, View, context = {}) => {
+export default (storeWrapper, View, context = {}) => {
   const childContextTypes = Object.keys(context).reduce((rtn, c) => Object.assign(rtn, { [c]: noop }), {});
 
   return class PageStore extends React.Component<any, any> {
@@ -17,14 +18,16 @@ export default (local, View, context = {}) => {
       this.View = connect(
         state => ({ ...state }),
         dispatch => ({
-          ...local.dispatchActions,
-          ...local.dispatchThunks,
-          form: local.form,
+          ...storeWrapper.dispatchActions,
+          ...storeWrapper.dispatchThunks,
+          form: storeWrapper.form,
           dispatch,
+          ...storeWrapper.dispatchActions,
+          ...storeWrapper.dispatchThunks,
         }),
       )(View);
-      this.form = local.form;
-      this.store = local.store;
+      this.form = storeWrapper.form;
+      this.store = storeWrapper.store;
     }
 
     componentDidMount() {
@@ -32,26 +35,18 @@ export default (local, View, context = {}) => {
     }
 
     getChildContext() {
-      return {
-        getError: local.getError,
-        visibleFunc: local.visibleFunc,
-        pageProps: { ...local.dispatchThunks, ...local.dispatchActions },
-      };
+      return context;
     }
 
     getForm = () => {
       if (typeof this.props.getForm === 'function') {
-        this.props.getForm(local.form);
+        this.props.getForm(storeWrapper.form);
       }
-    }
-
-    getError: (...args) => void = (..._args) => {
-      throw new Error('getError not implimented');
     }
 
     render() {
       return (
-        <Provider store={local.store}>
+        <Provider store={storeWrapper.store}>
           <this.View />
         </Provider>
       );
