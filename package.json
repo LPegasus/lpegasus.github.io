@@ -56,7 +56,7 @@
     "material-ui": "^0.20.0",
     "react-imgclip": "^1.0.0-beta.1",
     "react-router-dom": "^4.2.2",
-    "redux-thunk-promise": "^1.0.1",
+    "redux-mid-async-func": "^0.0.1",
     "tslib": "^1.9.0"
   }
 }

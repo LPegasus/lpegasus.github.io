@@ -1,5 +1,5 @@
 import { createStore as reduxCreateStore, applyMiddleware, AnyAction, compose } from 'redux';
-import thunk from './redux-thunk';
+import thunk from 'redux-mid-async-func';
 import omit from 'omit.js';
 import { internalActionType } from './constants';
 import {

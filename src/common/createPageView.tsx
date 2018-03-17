@@ -1,59 +1,60 @@
 import * as React from 'react';
 import { connect, Provider } from 'react-redux';
+const noop = () => null;
 
-export default (local, View) => class PageStore extends React.Component<any, any> {
-  static childContextTypes = {
-    getError: () => null,
-    visibleFunc: () => null,
-    pageProps: () => null,
-  };
-  store;
-  form;
-  View;
-  visibleCfg: { [key: string]: (state: any) => boolean }
+export default (local, View, context = {}) => {
+  const childContextTypes = Object.keys(context).reduce((rtn, c) => Object.assign(rtn, { [c]: noop }), {});
 
-  constructor(props, ctx) {
-    super(props, ctx);
-    this.View = connect(
-      state => ({ ...state }),
-      dispatch => ({
-        ...local.dispatchActions,
-        ...local.dispatchThunks,
-        form: local.form,
-        dispatch,
-      }),
-    )(View);
-    this.form = local.form;
-    this.store = local.store;
-  }
+  return class PageStore extends React.Component<any, any> {
+    static childContextTypes = childContextTypes;
+    store;
+    form;
+    View;
+    visibleCfg: { [key: string]: (state: any) => boolean }
 
-  componentDidMount() {
-    this.getForm();
-  }
-
-  getChildContext() {
-    return {
-      getError: local.getError,
-      visibleFunc: local.visibleFunc,
-      pageProps: { ...local.dispatchThunks, ...local.dispatchActions },
-    };
-  }
-
-  getForm = () => {
-    if (typeof this.props.getForm === 'function') {
-      this.props.getForm(local.form);
+    constructor(props, ctx) {
+      super(props, ctx);
+      this.View = connect(
+        state => ({ ...state }),
+        dispatch => ({
+          ...local.dispatchActions,
+          ...local.dispatchThunks,
+          form: local.form,
+          dispatch,
+        }),
+      )(View);
+      this.form = local.form;
+      this.store = local.store;
     }
-  }
 
-  getError: (...args) => void = (..._args) => {
-    throw new Error('getError not implimented');
-  }
+    componentDidMount() {
+      this.getForm();
+    }
 
-  render() {
-    return (
-      <Provider store={local.store}>
-        <this.View />
-      </Provider>
-    );
-  }
-};
+    getChildContext() {
+      return {
+        getError: local.getError,
+        visibleFunc: local.visibleFunc,
+        pageProps: { ...local.dispatchThunks, ...local.dispatchActions },
+      };
+    }
+
+    getForm = () => {
+      if (typeof this.props.getForm === 'function') {
+        this.props.getForm(local.form);
+      }
+    }
+
+    getError: (...args) => void = (..._args) => {
+      throw new Error('getError not implimented');
+    }
+
+    render() {
+      return (
+        <Provider store={local.store}>
+          <this.View />
+        </Provider>
+      );
+    }
+  };
+}
