@@ -7,13 +7,12 @@ import './frame.less';
 
 class Frame extends React.Component<any, any> {
   render() {
-    console.log(this.props.match);
     return (
       <React.Fragment>
         <Banner />
         <div style={{ display: 'flex' }}>
           <LeftMenuList />
-          <Content />
+          <Content match={this.props.match} />
         </div>
         <footer className="footer">footer</footer>
       </React.Fragment>

@@ -7,6 +7,8 @@
     "importHelpers": true,
     "declaration": true,
     "jsx": "react",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "lib": [
       "es2015",
       "dom"

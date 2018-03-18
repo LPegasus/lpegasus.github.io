@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { connect, Provider } from 'react-redux';
+import { ConnectedRouter } from 'react-router-redux';
 
 const noop = () => null;
 
-export default (storeWrapper, View, context = {}) => {
+export default (storeWrapper, View, context = {}, history?) => {
   const childContextTypes = Object.keys(context).reduce((rtn, c) => Object.assign(rtn, { [c]: noop }), {});
 
   return class PageStore extends React.Component<any, any> {
@@ -47,7 +48,10 @@ export default (storeWrapper, View, context = {}) => {
     render() {
       return (
         <Provider store={storeWrapper.store}>
-          <this.View />
+          {storeWrapper.history
+            ? <ConnectedRouter history={storeWrapper.history} store={storeWrapper.store}><this.View /></ConnectedRouter>
+            : <this.View />
+          }
         </Provider>
       );
     }

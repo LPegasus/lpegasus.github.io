@@ -6,6 +6,7 @@ import {
   bindActions, bindThunks,
   createWatchReducer,
 } from './utils';
+import { routerMiddleware, routerReducer } from 'react-router-redux';
 import validatingReducer from './reducers/validatingReducer';
 import forceUpdateReducer from './reducers/forceUpdateReducer';
 import stateChangeReducer from './reducers/stateChangeReducer';
@@ -18,8 +19,9 @@ function mergeReducer(...reducers) {
   if (reducers.length === 0) {
     return v => v;
   }
+  const rs = reducers.filter(r => typeof r === 'function');
   return (state, action) => {
-    return reducers.filter(r => typeof r === 'function')
+    return rs
       .reduce((preState, reducer) => {
         return reducer(preState, action);
       }, state);
@@ -34,7 +36,14 @@ export default function createStoreWrapper(config) {
         return local.visibleCfg[field](state);
       }
       return true;
-    }
+    },
+    store: null,
+    visibleCfg: null,
+    form: null,
+    getError: null,
+    dispatchActions: null,
+    dispatchThunks: null,
+    history: config.history,
   };
   // const flattenedData = flattenData(config.initialState);
   const flattenedData = config.initialState;
@@ -99,21 +108,35 @@ export default function createStoreWrapper(config) {
   const validateRunner = {
     run: () => { throw new Error('cannot call validator before store\'s been created.'); },
   } as any;
+
+  const middlewares = [
+    asyncThunksCallMiddleware(config.thunks),
+    thunk.withExtraArgument(extraArgument),
+    validatorRunnerMiddleware(validateRunner),
+  ];
+
+  const reducers = [
+    forceUpdateReducer,
+    stateChangeReducer,
+    mergeStateReducer,
+    validatingReducer,
+    customReducer,
+    watchReducer,
+  ];
+
+  if (config.history) {
+    middlewares.unshift(routerMiddleware(config.history));
+    reducers.unshift(routerReducer);
+  }
+
   const store = reduxCreateStore(
     mergeReducer(
-      forceUpdateReducer,
-      stateChangeReducer,
-      mergeStateReducer,
-      validatingReducer,
-      customReducer,
-      watchReducer,
+      ...reducers,
     ),
     initialState,
     composeEnhancers(
       applyMiddleware(
-        asyncThunksCallMiddleware(config.thunks),
-        thunk.withExtraArgument(extraArgument),
-        validatorRunnerMiddleware(validateRunner),
+        ...middlewares,
       ),
     ),
   );

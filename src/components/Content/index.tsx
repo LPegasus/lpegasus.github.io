@@ -1,11 +1,13 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
+import { Route } from 'react-router-dom';
+import ImageClipDemo from '../ImageClip';
 
 class Content extends React.Component<any, any> {
   render() {
-    return (
+   return (
       <div className="content">
-        <h1>666</h1>
+        <Route path={`/imgclip`} exact component={ImageClipDemo} />
       </div>
     )
   }

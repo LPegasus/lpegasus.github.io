@@ -10,7 +10,7 @@ export class Model {
   validators: Array<{ fields: string[]; rules: any }>;
 }
 
-const storeDecorator = <T extends Function>(Klass) =>
+const storeDecorator = <T extends Function>(Klass, history?) =>
   (View: T) => {
     const cls: Model = new Klass();
     const thunks = Reflect.ownKeys(Object.getPrototypeOf(cls))
@@ -25,6 +25,7 @@ const storeDecorator = <T extends Function>(Klass) =>
       watch: cls.watch,
       validators: cls.validators,
       thunks,
+      history,
     });
 
     Object.defineProperties(cls, {
@@ -46,7 +47,7 @@ const storeDecorator = <T extends Function>(Klass) =>
       {
         getError: storeWrapper.getError,
         visibleFunc: storeWrapper.visibleFunc,
-      }
+      },
     );
   }
 

@@ -110,9 +110,10 @@ module.exports = {
 
   stats: {
     assets: false,
+    warnings: false,
   },
 
-  watch: true,
+  watch: false,
 
   devServer: {
     compress: true, // enable gzip compression

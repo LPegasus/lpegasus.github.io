@@ -13,20 +13,19 @@ import {
 import BizLink from '../../common/BizLink';
 
 const LeftMenuList = (props) => {
-  console.log(props);
   return (
     <Drawer persistent open={props.leftMenuVisible}>
       <DrawerHeader>
         Blogs
       </DrawerHeader>
       <DrawerContent>
-        <ListItem>
-          <ListItemText>
-            <BizLink bizType="imgclip">
+        <BizLink bizType="imgclip">
+          <ListItem style={{ cursor: 'pointer' }}>
+            <ListItemText>
               Image Clip
-            </BizLink>
-          </ListItemText>
-        </ListItem>
+            </ListItemText>
+          </ListItem>
+        </BizLink>
       </DrawerContent>
     </Drawer>
   );
@@ -34,4 +33,5 @@ const LeftMenuList = (props) => {
 
 export default connect(
   state => pick(state, 'leftMenuVisible'),
+  dispatch => ({ dispatch }),
 )(LeftMenuList);
